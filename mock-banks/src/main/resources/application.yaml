@@ -1,0 +1,7 @@
+
+spring:
+  application:
+    name: mock-banks
+
+server:
+  port: 8081
