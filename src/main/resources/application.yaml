@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: backend
+banks:
+  aurora:
+    url: http://127.0.0.1:8081
+  horizonte:
+    url: http://127.0.0.1:8081

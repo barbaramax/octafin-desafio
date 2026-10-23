@@ -1,0 +1,13 @@
+
+POST http://127.0.0.1:8080/api/simulations
+Content-Type: application/json
+
+{
+  "name": "Maria Silva",
+  "email": "maria@email.com",
+  "cpf": "12345678909",
+  "salary": 2200,
+  "employerCnpj": "11222333000181",
+  "loanAmount": 12000,
+  "installments": 24
+}
