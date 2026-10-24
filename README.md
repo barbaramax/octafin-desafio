@@ -14,7 +14,9 @@ O backend recebe os dados da solicitação, consulta as APIs dos bancos e retorn
 - Spring Boot
 - Maven
 - APIs REST
-- React + TypeScript (frontend em desenvolvimento)
+- React + TypeScript 
+- Vite
+- CSS
 
 ## Estrutura e arquitetura
 
@@ -71,6 +73,9 @@ A IA me ajudou principalmente a compreender melhor decisões de arquitetura, int
 
 Utilizei esse suporte como parte do meu processo de aprendizado, buscando entender as implementações e os motivos por trás das escolhas feitas no projeto.
 
+No frontend, utilizei IA principalmente para auxiliar na construção da interface com React e TypeScript, na organização do código e na integração com o backend.
+Busquei manter a aplicação simples, entendendo o funcionamento das soluções sugeridas e adaptando o código às necessidades do projeto.
+
 ## Espaço para propor
 
 ### 1. Resiliência nas integrações
@@ -111,9 +116,10 @@ Utilizei esse suporte como parte do meu processo de aprendizado, buscando entend
 - Regras de aprovação independentes.
 - Padronização das respostas.
 - Tratamento básico de falhas.
+- Interface web.
+- Integração do frontend com o backend
 
 **Em desenvolvimento:**
-- Interface web.
 - Testes automatizados.
 - Melhorias na validação e no tratamento de erros.
 
