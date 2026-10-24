@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import java.time.Duration;
 
 import java.math.BigDecimal;
 
@@ -18,7 +20,16 @@ public class HorizonteAdapter implements BankProvider {
     private final RestClient restClient;
 
     public HorizonteAdapter(@Value("${banks.horizonte.url}") String url) {
-        this.restClient = RestClient.create(url);
+
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+
+        factory.setConnectTimeout(Duration.ofSeconds(2));
+        factory.setReadTimeout(Duration.ofSeconds(5));
+
+        this.restClient = RestClient.builder()
+                .baseUrl(url)
+                .requestFactory(factory)
+                .build();
     }
 
     @Override

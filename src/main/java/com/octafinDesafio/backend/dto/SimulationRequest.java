@@ -4,6 +4,8 @@ package com.octafinDesafio.backend.dto;
 import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
+import org.hibernate.validator.constraints.br.CPF;
+import org.hibernate.validator.constraints.br.CNPJ;
 
 public record SimulationRequest(
 
@@ -15,6 +17,7 @@ public record SimulationRequest(
         String email,
 
         @NotBlank
+        @CPF(message = "CPF inválido. Verifique os números informados.")
         String cpf,
 
         @NotNull
@@ -22,6 +25,7 @@ public record SimulationRequest(
         BigDecimal salary,
 
         @NotBlank
+        @CNPJ(message = "CNPJ inválido. Verifique os números informados.")
         String employerCnpj,
 
         @NotNull

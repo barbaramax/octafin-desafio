@@ -1,55 +1,84 @@
 
-# Octafin - Desafio Técnico
+# Octafin - Simulador de Empréstimo Consignado
+
 Projeto desenvolvido para o desafio técnico de estágio da Octafin.
 
 ## Sobre o projeto
 
-O sistema permite simular empréstimos consignados em dois bancos fictícios, cada um com suas próprias regras de aprovação e taxas.
+O sistema permite simular empréstimos consignados em dois bancos fictícios, cada um com suas próprias regras de aprovação.
 
-O backend recebe os dados da solicitação, consulta as APIs dos bancos e retorna os resultados em um formato padronizado, permitindo comparar as propostas.
+O usuário informa seus dados e as condições desejadas. O backend consulta os bancos e retorna os resultados em um formato padronizado, permitindo comparar as propostas.
 
-## Tecnologias
+## Tecnologias utilizadas
 
 - Java 21
 - Spring Boot
 - Maven
-- APIs REST
-- React + TypeScript 
+- JUnit 5
+- React + TypeScript
 - Vite
 - CSS
 
-## Estrutura e arquitetura
+## Arquitetura
 
-O projeto conta com duas aplicações Spring Boot:
+O projeto possui três partes:
 
-- **Backend principal:** recebe as solicitações, valida os dados e consulta os bancos.
+- **Backend:** recebe as solicitações, valida os dados e consulta os bancos.
 - **Mock Banks:** simula as APIs dos bancos Aurora e Horizonte.
+- **Frontend:** formulário para realizar simulações e visualizar os resultados.
 
-A organização segue o padrão Controller → Service, utilizando DTOs e interfaces para separar responsabilidades.
+No backend, utilizei a separação entre Controller, Service e Adapter.
 
-Também foi utilizado o padrão Adapter para converter as respostas diferentes dos bancos em um formato único.
+A interface `BankProvider` define um contrato comum para os bancos. Cada adapter realiza a comunicação HTTP e converte a resposta para o formato `BankResult`.
 
 ## Bancos fictícios
 
 | Regra | Aurora | Horizonte |
 |---|---|---|
-| Juros mensais | 1,8% | 2,2% |
+| Taxa mensal | 1,8% | 2,2% |
 | Máximo de parcelas | 48 | 60 |
 | Limite do salário | 30% | 35% |
 
-As regras e taxas são fictícias, e os cálculos utilizam juros simples.
+As regras são fictícias e utilizam juros simples para facilitar a simulação.
 
 ## Como executar
 
-**Pré-requisitos:** Java 21 e Maven.
+### Pré-requisitos
 
-1. Execute `MockBanksApplication`, no projeto `mock-banks` (porta 8081).
-2. Execute `BackendApplication`, no projeto principal (porta 8080).
-3. Faça uma requisição para o endpoint de simulação.
+- Java 21
+- Maven
+- Node.js e npm
 
-### Exemplo de requisição
+### 1. Mock Banks
 
-**POST** `http://localhost:8080/api/simulations`
+Execute `MockBanksApplication` no projeto `mock-banks`.
+
+Porta: `8081`.
+
+### 2. Backend
+
+Execute `BackendApplication` no projeto principal.
+
+Porta: `8080`.
+
+### 3. Frontend
+
+Na pasta `frontend`, execute:
+
+```bash
+npm install
+npm run dev
+```
+
+Acesse `http://localhost:5173`.
+
+As três aplicações devem estar executando para realizar as simulações.
+
+## Endpoint principal
+
+**POST** `/api/simulations`
+
+Exemplo de requisição:
 
 ```json
 {
@@ -63,66 +92,72 @@ As regras e taxas são fictícias, e os cálculos utilizam juros simples.
 }
 ```
 
-O sistema retorna as avaliações dos bancos, com os status `APPROVED`, `REJECTED` ou `UNAVAILABLE` e os valores das propostas aprovadas.
+O sistema retorna as avaliações dos bancos com os status:
+
+- `APPROVED`: empréstimo aprovado.
+- `REJECTED`: solicitação recusada.
+- `UNAVAILABLE`: banco indisponível ou falha na comunicação.
+
+## Validações e tratamento de erros
+
+O backend utiliza Bean Validation para validar os dados recebidos, incluindo CPF, CNPJ e valores obrigatórios.
+
+As integrações bancárias possuem timeouts configurados:
+
+- **Conexão:** 2 segundos.
+- **Leitura:** 5 segundos.
+
+Em caso de falha na comunicação, o banco é identificado como `UNAVAILABLE`, sem confundir uma indisponibilidade com uma rejeição.
+
+O frontend também apresenta uma mensagem de erro quando a simulação não pode ser realizada.
+
+## Testes
+
+Foram implementados testes unitários com JUnit 5 para os services dos bancos Aurora e Horizonte.
+
+Os testes verificam cenários de aprovação, rejeição e o cálculo dos valores das parcelas.
 
 ## Uso de Inteligência Artificial
 
-Durante o desenvolvimento, utilizei ferramentas de IA como apoio para estudar conceitos, esclarecer dúvidas e avaliar possíveis soluções.
+Durante o desenvolvimento, utilizei IA como ferramenta de apoio para estudar conceitos, tirar dúvidas e entender melhor algumas decisões técnicas.
 
-A IA me ajudou principalmente a compreender melhor decisões de arquitetura, integração entre APIs e boas práticas em Java e Spring Boot.
+No frontend, utilizei principalmente para auxiliar na construção da interface com React e TypeScript e na integração com o backend.
 
-Utilizei esse suporte como parte do meu processo de aprendizado, buscando entender as implementações e os motivos por trás das escolhas feitas no projeto.
-
-No frontend, utilizei IA principalmente para auxiliar na construção da interface com React e TypeScript, na organização do código e na integração com o backend.
-Busquei manter a aplicação simples, entendendo o funcionamento das soluções sugeridas e adaptando o código às necessidades do projeto.
+Procurei entender as soluções sugeridas e adaptar o código ao que fazia sentido para o projeto, mantendo uma implementação simples e organizada.
 
 ## Espaço para propor
 
-### 1. Resiliência nas integrações
-
-**Problema:** uma API bancária pode demorar ou ficar indisponível.
-
-**Proposta:** configurar timeouts e melhorar o tratamento individual de falhas.
-
-**Por quê:** evitar que problemas em um banco prejudiquem toda a simulação.
-
-**Status:** planejado.
-
-### 2. Consultas paralelas
+### 1. Consultas paralelas
 
 **Problema:** atualmente, os bancos são consultados sequencialmente.
 
-**Proposta:** realizar as consultas de forma concorrente.
+**Proposta:** executar as consultas em paralelo.
 
-**Por quê:** reduzir o tempo de resposta quando houver múltiplos bancos.
+**Por quê:** reduzir o tempo de espera quando houver vários bancos.
 
 **Status:** planejado.
 
-### 3. Validação e testes
+### 2. Melhorar a validação e os testes
 
-**Problema:** validações básicas e testes manuais não cobrem todos os cenários.
+**Problema:** os testes atuais cobrem apenas os cenários principais, e as mensagens de validação no frontend são genéricas.
 
-**Proposta:** implementar validação de CPF/CNPJ e testes automatizados com JUnit e Mockito.
+**Proposta:** adicionar testes para entradas inválidas, timeouts e falhas de integração, além de apresentar mensagens mais específicas para o usuário.
 
-**Por quê:** aumentar a confiabilidade e facilitar futuras alterações.
+**Por quê:** aumentar a confiabilidade e facilitar a identificação de problemas.
 
 **Status:** planejado.
 
 ## Status do projeto
 
-**Implementado:**
-- API REST de simulação.
-- Integração HTTP com dois bancos fictícios.
-- Regras de aprovação independentes.
-- Padronização das respostas.
-- Tratamento básico de falhas.
-- Interface web.
-- Integração do frontend com o backend
-
-**Em desenvolvimento:**
-- Testes automatizados.
-- Melhorias na validação e no tratamento de erros.
+- [x] Backend com Spring Boot
+- [x] Dois bancos fictícios
+- [x] Integração HTTP entre aplicações
+- [x] Padronização das respostas
+- [x] Frontend com React e TypeScript
+- [x] Validação de CPF e CNPJ
+- [x] Tratamento básico de erros
+- [x] Timeouts nas integrações
+- [x] Testes unitários com JUnit 5
 
 ---
 
-*Projeto desenvolvido exclusivamente para fins de avaliação técnica, utilizando bancos e dados fictícios.*
